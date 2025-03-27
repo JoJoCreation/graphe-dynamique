@@ -1,0 +1,19 @@
+{
+  "entités": [
+    { "nom": "A", "couleur": "blue" },
+    { "nom": "B1", "couleur": "red" },
+    { "nom": "B2", "couleur": "red" },
+    { "nom": "C11", "couleur": "green" },
+    { "nom": "C12", "couleur": "green" },
+    { "nom": "C21", "couleur": "green" },
+    { "nom": "C22", "couleur": "green" }
+  ],
+  "liens": [
+    { "source": "A", "target": "B1" },
+    { "source": "A", "target": "B2" },
+    { "source": "B1", "target": "C11" },
+    { "source": "B1", "target": "C12" },
+    { "source": "B2", "target": "C21" },
+    { "source": "B2", "target": "C22" }
+  ]
+}
