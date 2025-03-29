@@ -1,179 +1,148 @@
-// document.addEventListener("DOMContentLoaded", () => {
-//   fetch("data.json")
-//     .then((response) => response.json())
-//     .then((data) => {
-//       const container = document.querySelector(".container");
-//       const nodes = {};
+async function loadGraphData() {
+  const response = await fetch("data.json");
+  return response.json();
+}
 
-//       // Positionnement en grille
-//       const positions = {
-//         A: { x: 300, y: 50 },
-//         B1: { x: 200, y: 200 },
-//         B2: { x: 400, y: 200 },
-//         C11: { x: 100, y: 350 },
-//         C12: { x: 250, y: 350 },
-//         C21: { x: 350, y: 350 },
-//         C22: { x: 500, y: 350 },
-//       };
+async function drawGraph(filter) {
+  const data = await loadGraphData();
+  const svg = d3.select("#graph"),
+    width = +svg.attr("width"),
+    height = +svg.attr("height");
 
-//       // Création des nœuds
-//       data.entités.forEach((entité) => {
-//         const node = document.createElement("div");
-//         node.classList.add("node", entité.couleur);
-//         node.textContent = entité.nom;
-//         node.style.left = `${positions[entité.nom].x}px`;
-//         node.style.top = `${positions[entité.nom].y}px`;
-//         container.appendChild(node);
-//         nodes[entité.nom] = node;
+  svg.selectAll("*").remove(); // Effacer tout à chaque mise à jour
 
-//         // Animation avec GSAP pour les nœuds (apparition et animation)
-//         gsap.fromTo(
-//           node,
-//           { opacity: 0, scale: 0.5 },
-//           { opacity: 1, scale: 1, duration: 1.5, ease: "bounce.out" }
-//         );
-//       });
+  if (!filter || filter === "") return; // Ne rien afficher si vide
 
-//       // Création des liens avec flèches
-//       data.liens.forEach((lien) => {
-//         const sourceNode = nodes[lien.source];
-//         const targetNode = nodes[lien.target];
+  // Créer une map pour retrouver les nœuds par nom
+  const nodeMap = new Map(data.entités.map((d) => [d.nom, d]));
 
-//         const link = document.createElement("div");
-//         link.classList.add("link");
-//         container.appendChild(link);
+  // Filtrer les noeuds
+  let nodes =
+    filter === "all"
+      ? data.entités
+      : data.entités.filter((d) => d.nom === filter);
 
-//         // Position des liens
-//         const x1 = positions[lien.source].x + 30;
-//         const y1 = positions[lien.source].y + 30;
-//         const x2 = positions[lien.target].x + 30;
-//         const y2 = positions[lien.target].y + 30;
-
-//         const deltaX = x2 - x1;
-//         const deltaY = y2 - y1;
-//         const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-//         const angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
-
-//         link.style.width = `${distance}px`;
-//         link.style.transform = `rotate(${angle}deg)`;
-//         link.style.left = `${x1}px`;
-//         link.style.top = `${y1}px`;
-
-//         // Animation des liens avec GSAP (échelle et opacité)
-//         gsap.fromTo(
-//           link,
-//           { opacity: 0, width: 0 },
-//           { opacity: 1, width: distance, duration: 1.5, ease: "power2.inOut" }
-//         );
-//       });
-//     })
-//     .catch((error) =>
-//       console.error("Erreur lors du chargement du JSON :", error)
-//     );
-// });
-document.addEventListener("DOMContentLoaded", () => {
-  fetch("data.json")
-    .then((response) => response.json())
-    .then((data) => {
-      const container = document.querySelector(".container");
-      const nodes = {};
-
-      // Positionnement en grille
-      const positions = {
-        A: { x: 300, y: 50 },
-        B1: { x: 200, y: 200 },
-        B2: { x: 400, y: 200 },
-        C11: { x: 100, y: 350 },
-        C12: { x: 250, y: 350 },
-        C21: { x: 350, y: 350 },
-        C22: { x: 500, y: 350 },
-      };
-
-      // Création des nœuds
-      data.entités.forEach((entité) => {
-        const node = document.createElement("div");
-        node.classList.add("node", entité.couleur);
-        node.textContent = entité.nom;
-        node.style.left = `${positions[entité.nom].x}px`;
-        node.style.top = `${positions[entité.nom].y}px`;
-        container.appendChild(node);
-        nodes[entité.nom] = node;
-
-        // Animation fluide pour les nœuds (danse)
-        gsap.fromTo(
-          node,
-          { opacity: 0, scale: 0.5 },
-          {
-            opacity: 1,
-            scale: 1,
-            duration: 1.5,
-            ease: "bounce.out",
-            repeat: -1, // répéter l'animation
-            yoyo: true, // aller-retour pour donner un effet de danse
-            yoyoEase: "power1.inOut", // créer une transition plus fluide
-            rotation: 5, // légères rotations pour l'effet de danse
-            stagger: 0.2, // décalage d'animation entre chaque nœud
-          }
-        );
-      });
-
-      // Création des liens avec flèches
-      data.liens.forEach((lien) => {
-        const sourceNode = nodes[lien.source];
-        const targetNode = nodes[lien.target];
-
-        const link = document.createElement("div");
-        link.classList.add("link");
-        container.appendChild(link);
-
-        // Position des liens
-        const x1 = positions[lien.source].x + 30;
-        const y1 = positions[lien.source].y + 30;
-        const x2 = positions[lien.target].x + 30;
-        const y2 = positions[lien.target].y + 30;
-
-        const deltaX = x2 - x1;
-        const deltaY = y2 - y1;
-        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-        const angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
-
-        link.style.width = `${distance}px`;
-        link.style.transform = `rotate(${angle}deg)`;
-        link.style.left = `${x1}px`;
-        link.style.top = `${y1}px`;
-
-        // Animation des liens avec GSAP (échelle et opacité)
-        gsap.fromTo(
-          link,
-          { opacity: 0, width: 0 },
-          { opacity: 1, width: distance, duration: 1.5, ease: "power2.inOut" }
-        );
-      });
-
-      // Effet au clic : Animation des nœuds
-      document.querySelectorAll(".node").forEach((node) => {
-        node.addEventListener("click", (e) => {
-          // Applique une animation d'agrandissement au clic
-          gsap.to(e.target, {
-            scale: 1.5,
-            rotation: 360,
-            duration: 1,
-            ease: "elastic.out(1, 0.3)",
-            onComplete: () => {
-              // Remettre à la taille normale après l'animation
-              gsap.to(e.target, { scale: 1, rotation: 0, duration: 0.5 });
-            },
-          });
-        });
-      });
-    })
-    .catch((error) =>
-      console.error("Erreur lors du chargement du JSON :", error)
+  // Si l'utilisateur cherche une entité spécifique, on récupère ses liens associés
+  let links = [];
+  if (filter !== "all") {
+    // Filtrer tous les liens associés à l'entité demandée
+    links = data.liens.filter(
+      (link) => link.source === filter || link.target === filter
     );
-});
+  } else {
+    // Si "all", on garde tous les liens
+    links = data.liens;
+  }
 
-gsap.fromTo(
-  "h1",
-  { opacity: 0, y: -50 },
-  { opacity: 1, y: 0, duration: 1.5, ease: "power2.out" }
-);
+  // Construire le tableau des noeuds associés à ces liens
+  const nodesSet = new Set(nodes.map((node) => node.nom));
+  links.forEach((link) => {
+    nodesSet.add(link.source);
+    nodesSet.add(link.target);
+  });
+  nodes = Array.from(nodesSet).map((nom) => nodeMap.get(nom));
+
+  if (nodes.length === 0) return; // Si aucune entité trouvée, ne rien afficher
+
+  const simulation = d3
+    .forceSimulation(nodes)
+    .force(
+      "link",
+      d3
+        .forceLink(links)
+        .id((d) => d.nom)
+        .distance(100)
+    )
+    .force("charge", d3.forceManyBody().strength(-300))
+    .force("center", d3.forceCenter(width / 2, height / 2));
+
+  // Ajouter un marqueur pour les flèches
+  svg
+    .append("defs")
+    .append("marker")
+    .attr("id", "arrow")
+    .attr("viewBox", "0 -5 10 10")
+    .attr("refX", 10)
+    .attr("refY", 0)
+    .attr("markerWidth", 6)
+    .attr("markerHeight", 6)
+    .attr("orient", "auto-start-reverse")
+    .append("path")
+    .attr("d", "M0,-5L10,0L0,5")
+    .attr("fill", "black");
+
+  // Créer les liens
+  const link = svg
+    .selectAll(".link")
+    .data(links)
+    .enter()
+    .append("line")
+    .attr("class", "link")
+    .attr("stroke", "black")
+    .attr("stroke-width", 2)
+    .attr("marker-end", "url(#arrow)");
+
+  // Créer les noeuds
+  const node = svg
+    .selectAll(".node")
+    .data(nodes)
+    .enter()
+    .append("g")
+    .attr("class", "node")
+    .call(
+      d3
+        .drag()
+        .on("start", dragstarted)
+        .on("drag", dragged)
+        .on("end", dragended)
+    );
+
+  node
+    .append("circle")
+    .attr("r", 10)
+    .attr("fill", (d) => d.couleur);
+
+  node
+    .append("text")
+    .attr("dx", 12)
+    .attr("dy", ".35em")
+    .text((d) => d.nom);
+
+  simulation.on("tick", () => {
+    link
+      .attr("x1", (d) => d.source.x)
+      .attr("y1", (d) => d.source.y)
+      .attr("x2", (d) => d.target.x)
+      .attr("y2", (d) => d.target.y);
+
+    node.attr("transform", (d) => `translate(${d.x},${d.y})`);
+  });
+
+  function dragstarted(event, d) {
+    if (!event.active) simulation.alphaTarget(0.3).restart();
+    d.fx = d.x;
+    d.fy = d.y;
+  }
+
+  function dragged(event, d) {
+    d.fx = event.x;
+    d.fy = event.y;
+  }
+
+  function dragended(event, d) {
+    if (!event.active) simulation.alphaTarget(0);
+    d.fx = null;
+    d.fy = null;
+  }
+}
+
+// Fonction appelée au clic sur "Afficher"
+function updateGraph() {
+  const searchTerm = document.getElementById("search").value.trim();
+  drawGraph(searchTerm);
+}
+
+// Supprime tout au démarrage
+document.addEventListener("DOMContentLoaded", () => {
+  d3.select("#graph").selectAll("*").remove();
+});

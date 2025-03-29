@@ -3,20 +3,31 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Graphe Dynamique</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.1/gsap.min.js"></script>
-    <!-- GSAP CDN -->
+    <title>Graphe Interactif</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <h1>
-      Voici un exemple de graphe et j'ai utilisé du <br />GSAP en plus pour le
-      coté animation <br />
-    </h1>
-    <div class="container">
-      <!-- Les nœuds et les liens seront ajoutés dynamiquement ici par JavaScript -->
-    </div>
+    <input type="text" id="search" placeholder="Entrez une entité ou 'all'" />
+    <button onclick="updateGraph()">Afficher</button>
+    <svg id="graph" width="800" height="600"></svg>
 
+    <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="script.js"></script>
+
+    <script>
+      // Supprime le graphe au démarrage
+      document.addEventListener("DOMContentLoaded", () => {
+        d3.select("#graph").selectAll("*").remove();
+      });
+
+      // Ajoute l'écouteur pour la touche Entrée
+      document
+        .getElementById("search")
+        .addEventListener("keypress", function (event) {
+          if (event.key === "Enter") {
+            updateGraph();
+          }
+        });
+    </script>
   </body>
 </html>
